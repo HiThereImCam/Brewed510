@@ -1,19 +1,25 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-interface UserState {
-  userId: string | null;
-  email: string | null;
-  password: string | null;
+export interface UserState {
+  currentUser: string | null;
 }
 
 const initialState: UserState = {
-  userId: null,
-  email: null,
-  password: null,
+  currentUser: null,
 };
 
 const userSlice = createSlice({
   name: "user",
   initialState,
-  reducers: {},
+  reducers: {
+    addUser(state, action) {
+      console.log("dispatched action: ", action);
+      console.log("state: ", state);
+      state.currentUser = action.payload.currentUser;
+    },
+  },
 });
+
+export const { addUser } = userSlice.actions;
+
+export default userSlice.reducer;

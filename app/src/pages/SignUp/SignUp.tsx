@@ -1,10 +1,14 @@
 import React from "react";
 import { Form, Field } from "react-final-form";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 // import { createUser } from "../../firebase/firebase";
 
 import { realtimeDB, auth } from "../../firebase/firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { ref, set } from "firebase/database";
+
+import { addUser } from "../../features/user/userSlice";
 
 export interface UserInfo {
   firstName: string;
@@ -22,6 +26,9 @@ let initialState = {
 };
 
 export default function SignUp() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   let handleSubmit = async (values: UserInfo) => {
     const { email, password, firstName, lastName } = values;
 
@@ -40,6 +47,9 @@ export default function SignUp() {
 
       // need to dispatch action to the store
       // then use the userinformation throughout the page
+
+      dispatch(addUser({ currentUser: firstName }));
+      navigate(`/`);
     } catch (error: any) {
       const errorCode = error.code;
       const errorMessage = error.message;
