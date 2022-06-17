@@ -1,12 +1,21 @@
 import React from "react";
 import { Form, Field } from "react-final-form";
+// import { createUser } from "../../firebase/firebase";
+
+import { realtimeDB, auth } from "../../firebase/firebase";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { ref, set } from "firebase/database";
 
 export interface UserInfo {
+  firstName: string;
+  lastName: string;
   email: string;
   password: string;
 }
 
 let initialState = {
+  firstName: "",
+  lastName: "",
   email: "",
   password: "",
   confirmPassword: "",
@@ -14,7 +23,29 @@ let initialState = {
 
 export default function SignUp() {
   let handleSubmit = async (values: UserInfo) => {
-    console.log("Sign up values: ", values);
+    const { email, password, firstName, lastName } = values;
+
+    try {
+      let userCredentials = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      let userId = userCredentials.user.uid;
+      set(ref(realtimeDB, "users/" + userId), {
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+      });
+
+      // need to dispatch action to the store
+      // then use the userinformation throughout the page
+    } catch (error: any) {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      console.log("errorCode: ", errorCode);
+      console.log("errorMessage: ", errorMessage);
+    }
   };
 
   /**
@@ -29,6 +60,14 @@ export default function SignUp() {
       render={({ handleSubmit, form, submitting, pristine, values }) => (
         <form onSubmit={handleSubmit}>
           <div>
+            <label>First Name</label>
+            <Field
+              name="firstName"
+              component="input"
+              placeholder="First Name"
+            />
+            <label>Last Name</label>
+            <Field name="lastName" component="input" placeholder="Last Name" />
             <label>Email</label>
             <Field
               name="email"
@@ -45,7 +84,7 @@ export default function SignUp() {
             />
             <label>Confirm Password</label>
             <Field
-              name="confirm"
+              name="confirmPassword"
               component="input"
               type="password"
               placeholder="Confirm Password"
