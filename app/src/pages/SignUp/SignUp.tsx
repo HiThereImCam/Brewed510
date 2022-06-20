@@ -48,7 +48,7 @@ export default function SignUp() {
       // need to dispatch action to the store
       // then use the userinformation throughout the page
 
-      dispatch(addUser({ currentUser: firstName }));
+      dispatch(addUser({ currentUser: firstName, isLoggedIn: true }));
       navigate(`/`);
     } catch (error: any) {
       const errorCode = error.code;

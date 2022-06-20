@@ -1,5 +1,47 @@
 import "./Navbar.css";
+import { useSelector } from "react-redux";
+import { StoreInterface } from "../../store";
+import { Link } from "react-router-dom";
+import { Fragment } from "react";
 
 export default function Navbar() {
-  return <div className="navbar-container"></div>;
+  const isLoggedIn = useSelector(
+    (state: StoreInterface) => state.user.isLoggedIn
+  );
+
+  console.log("isLoggedIn: ", isLoggedIn);
+
+  /**
+   * what do i not want to show if they are not logged in?
+   */
+
+  return (
+    <div className="navbar-container">
+      <Link to="/" className="nav-logo">
+        Brewed510
+      </Link>
+      <div className="nav-items-container">
+        <Link to="/" className="nav-item">
+          Home
+        </Link>
+        <Link to="/menu" className="nav-item">
+          Menu
+        </Link>
+        {!isLoggedIn ? (
+          <Fragment>
+            <Link to="/login" className="nav-item">
+              Login
+            </Link>
+            <Link to="/signup" className="nav-item">
+              Sign Up
+            </Link>
+          </Fragment>
+        ) : (
+          <Link to="/" className="nav-item">
+            Sign Out
+          </Link>
+        )}
+      </div>
+    </div>
+  );
 }
