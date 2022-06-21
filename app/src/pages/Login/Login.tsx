@@ -1,15 +1,51 @@
-import React from "react";
 import { Form, Field } from "react-final-form";
 import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { realtimeDB, auth } from "../../firebase/firebase";
+import { ref, onValue } from "firebase/database";
+
+import { loginUser } from "../../features/user/userSlice";
 
 export interface UserLogin {
-  username: string;
+  email: string;
   password: string;
 }
 
 export default function Login() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const onSubmit = async (values: UserLogin) => {
-    console.log("values: ", values);
+    const { email, password } = values;
+    try {
+      const userCredentials = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+
+      // if the user is on /checkout, they should not be rerouted to home
+      // but for now they will be
+
+      /**
+       * 
+       const starCountRef = ref(db, 'posts/' + postId + '/starCount');
+onValue(starCountRef, (snapshot) => {
+  const data = snapshot.val();
+  updateStarCount(postElement, data);
+});
+       */
+      const userID = userCredentials.user.uid;
+      const userRef = ref(realtimeDB, `users/${userID}`);
+
+      onValue(userRef, (snapshot) => {
+        console.log("snapshot val: ", snapshot.val());
+        let currentUser = snapshot.val().firstName;
+        dispatch(loginUser({ currentUser: currentUser, isLoggedIn: true }));
+        navigate("/");
+      });
+    } catch (e: any) {}
   };
 
   return (

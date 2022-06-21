@@ -1,15 +1,28 @@
 import "./Navbar.css";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { StoreInterface } from "../../store";
 import { Link } from "react-router-dom";
 import { Fragment } from "react";
+import { auth } from "../../firebase/firebase";
+import { signOut } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
+import { signOutUser } from "../../features/user/userSlice";
 
 export default function Navbar() {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   const isLoggedIn = useSelector(
     (state: StoreInterface) => state.user.isLoggedIn
   );
 
   console.log("isLoggedIn: ", isLoggedIn);
+
+  let handleSignOut = async () => {
+    await signOut(auth);
+    dispatch(signOutUser());
+    navigate("/");
+  };
 
   /**
    * what do i not want to show if they are not logged in?
@@ -37,9 +50,9 @@ export default function Navbar() {
             </Link>
           </Fragment>
         ) : (
-          <Link to="/" className="nav-item">
+          <button onClick={handleSignOut} className="nav-item">
             Sign Out
-          </Link>
+          </button>
         )}
       </div>
     </div>
