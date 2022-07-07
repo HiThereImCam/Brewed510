@@ -16,8 +16,6 @@ export default function Navbar() {
     (state: StoreInterface) => state.user.isLoggedIn
   );
 
-  console.log("isLoggedIn: ", isLoggedIn);
-
   let handleSignOut = async () => {
     await signOut(auth);
     dispatch(signOutUser());
